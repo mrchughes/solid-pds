@@ -4,6 +4,32 @@
 
 The Solid Personal Data Store (PDS) is a core component of the PDS 2.0 ecosystem, providing a secure, user-controlled storage solution based on Solid standards. It enables users to manage their personal data and grant organizations access to specific resources using fine-grained permissions.
 
+## Microservice Architecture Requirements
+
+As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural principles:
+
+1. **Loose Coupling**: 
+   - Operates as an independent microservice with clear boundaries
+   - Communicates with other services only through well-defined APIs
+   - Does not share databases or internal data structures with other services
+   - Uses the API Registry for service discovery
+
+2. **Complete Implementation**:
+   - All endpoints must be fully implemented with no placeholders
+   - Error handling must follow the PDS error handling standards
+   - All required functionality must be present before deployment
+
+3. **API Publication**:
+   - Must publish its OpenAPI specification to the API Registry on startup
+   - Must keep its API documentation current and accurate
+   - Should version its API appropriately using semantic versioning
+
+4. **GOV.UK Design System Compliance**:
+   - All user interfaces must comply with the GOV.UK Design System
+   - Must meet WCAG 2.1 AA accessibility standards
+   - Must follow GOV.UK content design guidelines
+   - Error messages must follow GOV.UK standards
+
 ## Service Responsibilities
 
 1. **Data Storage and Management**
@@ -280,6 +306,72 @@ The Solid Personal Data Store (PDS) is a core component of the PDS 2.0 ecosystem
   "expiresAt": "string"
 }
 ```
+
+## Development Approach
+
+### API-First Design
+
+- All endpoints must be designed and documented using OpenAPI 3.0 before implementation
+- API specifications must be stored in the `/specifications` directory
+- Changes to the API must be documented and versioned appropriately
+- API design must follow RESTful principles and standard HTTP methods
+- Must follow Solid protocol specifications and standards
+
+### Test-Driven Development
+
+- All functionality must have corresponding unit and integration tests
+- Test coverage should meet or exceed 85% for all critical paths
+- Mock services should be used to test integration points
+- End-to-end tests should verify the complete data flow and user authorization journey
+- Security testing must be comprehensive for all data access operations
+
+### Cross-Service Integration
+
+- All interactions with other services must be implemented using the API Registry
+- Must integrate with all participating organizations for credential operations
+- Services should gracefully handle unavailability of dependent services
+- Retry mechanisms should be implemented for transient failures
+- Circuit breakers should be used to prevent cascading failures
+- Must implement asynchronous authorization workflow for all credential operations
+
+## Integration Points
+
+### API Registry Integration
+
+- Service must register with the API Registry on startup
+- Must publish OpenAPI specification to the registry
+- Must use the API Registry to discover other services
+- Should update the registry when service status changes
+
+### Other Service Dependencies
+
+| Service | Dependency Type | Purpose |
+|---------|----------------|---------|
+| Auth Service | Authentication | User authentication for accessing the PDS |
+| API Registry | Service Discovery | Locating and accessing other services |
+| DRO | Organization | Issues debt relief credentials to users |
+| FEP | Organization | Issues benefit award credentials to users |
+| Northern Electric | Organization | Issues electric bill credentials to users |
+
+## Monitoring and Observability
+
+- Must implement health check endpoint (`/health`)
+- Must expose metrics endpoint (`/metrics`) for Prometheus
+- Must implement structured logging
+- Should include trace IDs in logs for distributed tracing
+- Should implement performance monitoring for all data access operations
+- Should track metrics on storage usage, credential operations, and authorization requests
+- Must implement alerting for security-related events
+
+## Deployment and Scalability
+
+- Service must be containerized using Docker
+- Must support horizontal scaling for API components
+- Must manage persistent storage for user pods
+- Configuration should be environment-based
+- Should support zero-downtime deployments
+- Must implement backup and recovery procedures for all user data
+- Should implement caching for frequently accessed resources
 
 ## Dependencies
 

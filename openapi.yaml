@@ -1,0 +1,787 @@
+openapi: 3.0.3
+info:
+  title: Solid PDS API
+  description: API for the PDS 2.0 Personal Data Store based on Solid standards
+  version: 1.0.0
+  contact:
+    name: PDS 2.0 Team
+servers:
+  - url: https://pds.local
+    description: Production server
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: pods
+    description: Pod management operations
+  - name: resources
+    description: Resource management operations
+  - name: organizations
+    description: Organization management operations
+  - name: access
+    description: Access control operations
+  - name: auth
+    description: Authorization operations
+
+paths:
+  /pods:
+    post:
+      tags:
+        - pods
+      summary: Create a new pod
+      description: Creates a new pod for a user
+      operationId: createPod
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PodCreationRequest'
+      responses:
+        '201':
+          description: Pod created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PodResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Pod already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /pods/{podId}:
+    get:
+      tags:
+        - pods
+      summary: Get pod information
+      description: Retrieves information about a specific pod
+      operationId: getPod
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: podId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pod information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PodInfoResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Pod not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /{path}:
+    post:
+      tags:
+        - resources
+      summary: Create a resource
+      description: Creates a new resource at the specified path
+      operationId: createResource
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Resource path
+        - name: Content-Type
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Resource content type
+      requestBody:
+        required: true
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Resource created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URI of the created resource
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Resource already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - resources
+      summary: Get a resource
+      description: Retrieves a resource at the specified path
+      operationId: getResource
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Resource path
+      responses:
+        '200':
+          description: Resource content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - resources
+      summary: Update a resource
+      description: Updates an existing resource at the specified path
+      operationId: updateResource
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Resource path
+        - name: Content-Type
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Resource content type
+      requestBody:
+        required: true
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Resource updated
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - resources
+      summary: Delete a resource
+      description: Deletes a resource at the specified path
+      operationId: deleteResource
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Resource path
+      responses:
+        '204':
+          description: Resource deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /orgs/register:
+    post:
+      tags:
+        - organizations
+      summary: Register organization
+      description: Registers a new organization with DID
+      operationId: registerOrganization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationRegistrationRequest'
+      responses:
+        '201':
+          description: Organization registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationRegistrationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Organization already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /orgs/verify:
+    post:
+      tags:
+        - organizations
+      summary: Verify organization DID
+      description: Verifies organization ownership of DID
+      operationId: verifyOrganizationDid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationVerificationRequest'
+      responses:
+        '200':
+          description: Organization verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationVerificationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /access/request:
+    post:
+      tags:
+        - access
+      summary: Request resource access
+      description: Requests access to a user's resource
+      operationId: requestAccess
+      security:
+        - didAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessRequest'
+      responses:
+        '201':
+          description: Access request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequestResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/requests:
+    get:
+      tags:
+        - auth
+      summary: List pending authorization requests
+      description: Gets pending authorization requests for the authenticated user
+      operationId: listAuthRequests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of pending authorization requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/requests/{requestId}/respond:
+    post:
+      tags:
+        - auth
+      summary: Respond to authorization request
+      description: Approves or denies an authorization request
+      operationId: respondToAuthRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthResponse'
+      responses:
+        '200':
+          description: Response recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseResult'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the service
+      operationId: getHealth
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, error]
+                  version:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+components:
+  schemas:
+    PodCreationRequest:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: WebID of the owner
+          example: https://john_doe.pds.local/profile/card#me
+        podName:
+          type: string
+          description: Optional pod name
+          example: personal
+      required:
+        - owner
+
+    PodResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: pod_123456
+        webId:
+          type: string
+          format: uri
+          example: https://john_doe.pds.local/profile/card#me
+        podUrl:
+          type: string
+          format: uri
+          example: https://john_doe.pds.local/
+        created:
+          type: string
+          format: date-time
+      required:
+        - id
+        - webId
+        - podUrl
+        - created
+
+    PodInfoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: pod_123456
+        webId:
+          type: string
+          format: uri
+          example: https://john_doe.pds.local/profile/card#me
+        podUrl:
+          type: string
+          format: uri
+          example: https://john_doe.pds.local/
+        created:
+          type: string
+          format: date-time
+        storage:
+          type: object
+          properties:
+            used:
+              type: number
+              format: int64
+              example: 1048576
+            limit:
+              type: number
+              format: int64
+              example: 1073741824
+          required:
+            - used
+            - limit
+      required:
+        - id
+        - webId
+        - podUrl
+        - created
+        - storage
+
+    OrganizationRegistrationRequest:
+      type: object
+      properties:
+        did:
+          type: string
+          example: did:web:agency.gov.uk
+        name:
+          type: string
+          example: Government Agency
+        description:
+          type: string
+          example: Official government agency for benefit administration
+        url:
+          type: string
+          format: uri
+          example: https://agency.gov.uk
+      required:
+        - did
+        - name
+
+    OrganizationRegistrationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: org_123456
+        did:
+          type: string
+          example: did:web:agency.gov.uk
+        name:
+          type: string
+          example: Government Agency
+        challenge:
+          type: string
+          example: a1b2c3d4e5f6g7h8i9j0
+        status:
+          type: string
+          enum: [pending]
+          example: pending
+      required:
+        - id
+        - did
+        - name
+        - challenge
+        - status
+
+    OrganizationVerificationRequest:
+      type: object
+      properties:
+        did:
+          type: string
+          example: did:web:agency.gov.uk
+        challenge:
+          type: string
+          example: a1b2c3d4e5f6g7h8i9j0
+        signature:
+          type: string
+          example: 0x1a2b3c...
+      required:
+        - did
+        - challenge
+        - signature
+
+    OrganizationVerificationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: org_123456
+        did:
+          type: string
+          example: did:web:agency.gov.uk
+        name:
+          type: string
+          example: Government Agency
+        status:
+          type: string
+          enum: [verified]
+          example: verified
+        verifiedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - did
+        - name
+        - status
+        - verifiedAt
+
+    AccessRequest:
+      type: object
+      properties:
+        userWebId:
+          type: string
+          format: uri
+          example: https://john_doe.pds.local/profile/card#me
+        resourcePath:
+          type: string
+          example: /private/credentials/debt-relief
+        accessMode:
+          type: string
+          enum: [read, write, append]
+          example: read
+        purpose:
+          type: string
+          example: Verify debt relief eligibility for benefit award
+        expires:
+          type: string
+          format: date-time
+          description: Optional expiration date
+      required:
+        - userWebId
+        - resourcePath
+        - accessMode
+        - purpose
+
+    AccessRequestResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: access_123456
+        status:
+          type: string
+          enum: [pending]
+          example: pending
+        expiresAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - expiresAt
+
+    AuthRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: auth_123456
+        organization:
+          type: object
+          properties:
+            id:
+              type: string
+              example: org_123456
+            name:
+              type: string
+              example: Government Agency
+            did:
+              type: string
+              example: did:web:agency.gov.uk
+          required:
+            - id
+            - name
+            - did
+        resourcePath:
+          type: string
+          example: /private/credentials/debt-relief
+        accessMode:
+          type: string
+          enum: [read, write, append]
+          example: read
+        purpose:
+          type: string
+          example: Verify debt relief eligibility for benefit award
+        requestedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - organization
+        - resourcePath
+        - accessMode
+        - purpose
+        - requestedAt
+        - expiresAt
+
+    AuthResponse:
+      type: object
+      properties:
+        approved:
+          type: boolean
+          example: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: Optional custom expiration
+      required:
+        - approved
+
+    AuthResponseResult:
+      type: object
+      properties:
+        id:
+          type: string
+          example: auth_123456
+        status:
+          type: string
+          enum: [approved, denied]
+          example: approved
+        respondedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - respondedAt
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: pod/not-found
+            message:
+              type: string
+              example: Pod not found
+            details:
+              type: object
+      required:
+        - error
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
+    didAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: DID
