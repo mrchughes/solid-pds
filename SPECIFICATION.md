@@ -49,8 +49,16 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
    - Process organization access requests
    - Support asynchronous user authorization
    - Manage organization permissions and access logs
+   - Verify user DID ownership for organizations
+   - Issue OAuth tokens to verified organizations
 
-4. **Verifiable Credentials**
+4. **User DID Management**
+   - Verify user ownership of DIDs
+   - Handle challenge-response verification
+   - Support out-of-band user notifications
+   - Manage DID-based access approvals
+
+5. **Verifiable Credentials**
    - Store verifiable credentials in user pods
    - Support credential issuance workflows
    - Enable secure credential sharing
@@ -186,6 +194,29 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
   }
   ```
 
+#### Verify User DID Ownership
+
+- **Endpoint:** `POST /users/verify-did`
+- **Description:** Verify a user's ownership of a DID (called by organizations)
+- **Authentication:** Organization DID
+- **Request Body:**
+  ```json
+  {
+    "userDid": "string",
+    "organizationDid": "string",
+    "requestId": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "verificationId": "string",
+    "status": "pending",
+    "userNotified": true,
+    "expiresAt": "string"
+  }
+  ```
+
 #### Request Resource Access
 
 - **Endpoint:** `POST /access/request`
@@ -254,6 +285,56 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
     "id": "string",
     "status": "approved|denied",
     "respondedAt": "string"
+  }
+  ```
+
+### OAuth Token Management
+
+#### Issue Organization Access Token
+
+- **Endpoint:** `POST /oauth/token`
+- **Description:** Issue OAuth access and refresh tokens to verified organizations
+- **Authentication:** None (uses DID-based verification)
+- **Request Body:**
+  ```json
+  {
+    "grant_type": "client_credentials",
+    "client_id": "string",
+    "client_secret": "string", // Organization's DID
+    "scope": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "access_token": "string",
+    "refresh_token": "string",
+    "token_type": "Bearer",
+    "expires_in": "number",
+    "scope": "string"
+  }
+  ```
+
+#### Refresh Access Token
+
+- **Endpoint:** `POST /oauth/refresh`
+- **Description:** Refresh an expired access token
+- **Authentication:** None
+- **Request Body:**
+  ```json
+  {
+    "grant_type": "refresh_token",
+    "refresh_token": "string",
+    "client_id": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "access_token": "string",
+    "refresh_token": "string",
+    "token_type": "Bearer",
+    "expires_in": "number"
   }
   ```
 
