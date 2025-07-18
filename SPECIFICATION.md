@@ -400,7 +400,7 @@ MONGODB_URI=mongodb://mongodb:27017/solid-pds
 REDIS_URL=redis://redis:6379
 
 # Authentication settings
-AUTH_SERVICE_URL=http://auth-service:3001
+AUTH_SERVICE_URL=http://OIDC-Identity-Service:3001
 OIDC_ISSUER=https://auth.pds.local
 
 # Storage settings
