@@ -430,7 +430,7 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
 |---------|----------------|---------|
 | Identity Provider Service | Authentication | User authentication for accessing the PDS |
 | API Registry | Service Discovery | Locating and accessing other services |
-| DRO | Organization | Issues debt relief credentials to users |
+| DRO | Organization | Issues departmental records credentials to users |
 | FEP | Organization | Issues benefit award credentials to users |
 | Northern Electric | Organization | Issues electric bill credentials to users |
 

@@ -22,6 +22,12 @@ tags:
     description: Access control operations
   - name: auth
     description: Authorization operations
+  - name: users
+    description: User management operations
+  - name: oauth
+    description: OAuth token management operations
+  - name: did
+    description: DID operations and verification
 
 paths:
   /pods:
@@ -469,6 +475,227 @@ paths:
                     type: string
                     format: date-time
 
+  /users/verify-did:
+    post:
+      tags:
+        - users
+      summary: Verify user DID
+      description: Verify user DID ownership and register with PDS (PDS 2.1 Requirement #5)
+      operationId: verifyUserDid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - did
+                - proof
+              properties:
+                did:
+                  type: string
+                  description: The user's DID
+                proof:
+                  type: string
+                  description: Cryptographic proof of DID ownership
+      responses:
+        '200':
+          description: DID verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  did:
+                    type: string
+                  message:
+                    type: string
+
+  /organizations/register:
+    post:
+      tags:
+        - organizations
+      summary: Register organization
+      description: Register an organization with the PDS (PDS 2.1 Requirement #3)
+      operationId: registerOrganization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - did
+                - domain
+              properties:
+                name:
+                  type: string
+                did:
+                  type: string
+                domain:
+                  type: string
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Organization registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client_id:
+                    type: string
+                  client_secret:
+                    type: string
+                  message:
+                    type: string
+
+  /oauth/token:
+    post:
+      tags:
+        - oauth
+      summary: Issue OAuth access token
+      description: Issue OAuth access token for organization access (PDS 2.1 Requirement #5)
+      operationId: issueOAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_id
+                - client_secret
+                - grant_type
+              properties:
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+                grant_type:
+                  type: string
+                  enum: [client_credentials]
+                scope:
+                  type: string
+      responses:
+        '200':
+          description: Access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  scope:
+                    type: string
+
+  /oauth/refresh:
+    post:
+      tags:
+        - oauth
+      summary: Refresh OAuth access token
+      description: Refresh OAuth access token using refresh token
+      operationId: refreshOAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+                - client_id
+                - client_secret
+              properties:
+                refresh_token:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  scope:
+                    type: string
+
+  /.well-known/did/challenge:
+    get:
+      tags:
+        - did
+      summary: Get PDS challenge
+      description: Request a challenge for PDS domain verification (PDS 2.1 Requirement #3)
+      operationId: getPdsChallenge
+      responses:
+        '200':
+          description: Challenge issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge:
+                    type: string
+                  expires_in:
+                    type: integer
+    post:
+      tags:
+        - did
+      summary: Submit PDS challenge response
+      description: Submit signed challenge for PDS domain verification
+      operationId: submitPdsChallenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - challenge
+                - signature
+                - did
+              properties:
+                challenge:
+                  type: string
+                signature:
+                  type: string
+                did:
+                  type: string
+      responses:
+        '200':
+          description: Challenge verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  message:
+                    type: string
+
 components:
   schemas:
     PodCreationRequest:
@@ -644,14 +871,14 @@ components:
           example: https://john_doe.pds.local/profile/card#me
         resourcePath:
           type: string
-          example: /private/credentials/debt-relief
+          example: /private/credentials/departmental-records
         accessMode:
           type: string
           enum: [read, write, append]
           example: read
         purpose:
           type: string
-          example: Verify debt relief eligibility for benefit award
+          example: Verify departmental records eligibility for benefit award
         expires:
           type: string
           format: date-time
@@ -704,14 +931,14 @@ components:
             - did
         resourcePath:
           type: string
-          example: /private/credentials/debt-relief
+          example: /private/credentials/departmental-records
         accessMode:
           type: string
           enum: [read, write, append]
           example: read
         purpose:
           type: string
-          example: Verify debt relief eligibility for benefit award
+          example: Verify departmental records eligibility for benefit award
         requestedAt:
           type: string
           format: date-time
