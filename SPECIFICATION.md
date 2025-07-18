@@ -347,7 +347,7 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
 
 | Service | Dependency Type | Purpose |
 |---------|----------------|---------|
-| Auth Service | Authentication | User authentication for accessing the PDS |
+| Identity Provider Service | Authentication | User authentication for accessing the PDS |
 | API Registry | Service Discovery | Locating and accessing other services |
 | DRO | Organization | Issues debt relief credentials to users |
 | FEP | Organization | Issues benefit award credentials to users |
@@ -378,7 +378,7 @@ As part of the PDS 2.0 ecosystem, the Solid PDS follows these architectural prin
 1. **External Services**
    - MongoDB: Metadata and indexing
    - Redis: Session and cache
-   - Auth Service: User authentication
+   - Identity Provider Service: User authentication
    - API Registry: Service registration
 
 2. **Libraries**

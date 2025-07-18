@@ -11,7 +11,7 @@ The Solid PDS (Personal Data Store) service is based on the Community Solid Serv
 - Standards-compliant LDP (Linked Data Platform) implementation
 - Web Access Control (WAC) for fine-grained permissions
 - OAuth 2.0 client registration and token handling
-- Integration with Authentication Service for user login
+- Integration with Identity Provider Service for user login
 
 ## Getting Started
 
@@ -39,7 +39,7 @@ npm run dev
 ## Architecture
 
 The Solid PDS is built on top of the Community Solid Server with custom extensions for:
-- Integration with the Authentication Service
+- Integration with the Identity Provider Service
 - Support for DID-based verifiable credentials
 - Enhanced security features
 - Custom plugins for government service requirements

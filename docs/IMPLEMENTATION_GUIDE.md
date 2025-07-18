@@ -1,4 +1,14 @@
-# Solid PDS Implementation Guide
+# Solid ### Identity Provider Service Integration
+
+The Solid PDS integrates with the Identity Provider Service for user authentication:
+
+1. **User Registration**:
+   - When a user registers through the Identity Provider Service, a pod is created in the Solid PDS
+   - The Identity Provider Service provides the user's WebID to the Solid PDS
+
+2. **User Authentication**:
+   - The Solid PDS uses the Identity Provider Service as an OIDC provider
+   - When a user logs in through the Identity Provider Service, they receive tokens for accessing their Solid podntation Guide
 
 ## Overview
 
@@ -6,17 +16,17 @@ This guide provides implementation details for the Solid Personal Data Store (PD
 
 ## Integration Points
 
-### Authentication Service Integration
+### Identity Provider Service Integration
 
-The Solid PDS integrates with the Authentication Service for user authentication:
+The Solid PDS integrates with the Identity Provider Service for user authentication:
 
 1. **User Registration**
-   - When a user registers through the Authentication Service, a pod is created in the Solid PDS
-   - The Authentication Service provides the user's WebID to the Solid PDS
+   - When a user registers through the Identity Provider Service, a pod is created in the Solid PDS
+   - The Identity Provider Service provides the user's WebID to the Solid PDS
 
 2. **User Authentication**
-   - The Solid PDS uses the Authentication Service as an OIDC provider
-   - When a user logs in through the Authentication Service, they receive tokens for accessing their Solid pod
+   - The Solid PDS uses the Identity Provider Service as an OIDC provider
+   - When a user logs in through the Identity Provider Service, they receive tokens for accessing their Solid pod
 
 ### API Registry Integration
 
@@ -50,7 +60,7 @@ The Solid PDS implements several security measures:
    - Users can define who has access to their data
 
 2. **Authentication**
-   - OIDC-based authentication using the Authentication Service
+   - OIDC-based authentication using the Identity Provider Service
    - Support for WebID-TLS for certificate-based authentication
 
 3. **Authorization**
@@ -63,7 +73,7 @@ The Solid PDS implements several security measures:
 - [ ] Configure WebID profile creation
 - [ ] Implement pod creation
 - [ ] Set up Web Access Control
-- [ ] Configure OIDC integration with Auth Service
+- [ ] Configure OIDC integration with Identity Provider Service
 - [ ] Implement OAuth client registration
 - [ ] Add support for storing verifiable credentials
 - [ ] Set up API Registry integration
