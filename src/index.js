@@ -20,24 +20,24 @@ app.use(express.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
-    service: 'solid-pds',
-    version: process.env.SERVICE_VERSION || '1.0.0'
-  });
+    res.status(200).json({
+        status: 'ok',
+        service: 'solid-pds',
+        version: process.env.SERVICE_VERSION || '1.0.0'
+    });
 });
 
 // Basic routes for demo purposes
 app.get('/', (req, res) => {
-  res.send('Solid PDS Service');
+    res.send('Solid PDS Service');
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`Solid PDS Service listening on port ${port}`);
-  
-  // Publish API specification to API Registry
-  publishApiSpec().catch(err => {
-    console.error('Error publishing API specification:', err.message);
-  });
+    console.log(`Solid PDS Service listening on port ${port}`);
+
+    // Publish API specification to API Registry
+    publishApiSpec().catch(err => {
+        console.error('Error publishing API specification:', err.message);
+    });
 });
