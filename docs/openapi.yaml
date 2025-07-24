@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Solid PDS
+  version: 1.0.0
+  description: Solid Personal Data Store API for the PDS3.0 project
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+paths:
+  /profile/card:
+    get:
+      summary: Get WebID Profile
+      responses:
+        '200':
+          description: WebID profile in Turtle
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  @prefix solid: <http://www.w3.org/ns/solid/terms#> .
+                  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                  
+                  <#me> a foaf:Person ;
+                    foaf:name "Test User" ;
+                    solid:oidcIssuer <https://oidc.example.org> .
+    put:
+      summary: Update WebID Profile
+      requestBody:
+        content:
+          text/turtle:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Updated
+  /credentials/{vcId}:
+    get:
+      summary: Read credential
+      parameters:
+        - name: vcId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: VC as Turtle or JSON-LD
+    put:
+      summary: Write credential
+      parameters:
+        - name: vcId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          text/turtle:
+            schema:
+              type: string
+          application/ld+json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Stored
+    delete:
+      summary: Delete credential
+      parameters:
+        - name: vcId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /.acl:
+    put:
+      summary: Set access permissions
+      requestBody:
+        content:
+          text/turtle:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Access rules updated
+components:
+  securitySchemes:
+    solidOidc:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://oidc.example.org/authorize
+          tokenUrl: https://oidc.example.org/token
+          scopes:
+            openid: OpenID connect scope
+            webid: WebID scope
+security:
+  - solidOidc: [openid, webid]

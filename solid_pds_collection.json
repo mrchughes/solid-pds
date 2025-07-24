@@ -1,193 +1,193 @@
 {
-  "info": {
-    "name": "Solid PDS Must-Pass Collection",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Get WebID Profile",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/profile/card",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "profile",
-            "card"
-          ]
-        },
-        "body": null
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ]
-          }
-        }
-      ]
+    "info": {
+        "name": "Solid PDS Must-Pass Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
-    {
-      "name": "Put VC",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/credentials/123",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "credentials",
-            "123"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\"@context\": \"...\", \"type\": \"VerifiableCredential\"}"
-        }
-      },
-      "event": [
+    "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
+            "name": "Get WebID Profile",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/profile/card",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "profile",
+                        "card"
+                    ]
+                },
+                "body": null
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ]
+                    }
+                }
             ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Get VC",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/credentials/123",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "credentials",
-            "123"
-          ]
         },
-        "body": null
-      },
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
+            "name": "Put VC",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/credentials/123",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "credentials",
+                        "123"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"@context\": \"...\", \"type\": \"VerifiableCredential\"}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ]
+                    }
+                }
             ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Delete VC",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/credentials/123",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "credentials",
-            "123"
-          ]
         },
-        "body": null
-      },
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
+            "name": "Get VC",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/credentials/123",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "credentials",
+                        "123"
+                    ]
+                },
+                "body": null
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ]
+                    }
+                }
             ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Update ACL",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/.acl",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            ".acl"
-          ]
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\"access\": \"read\", \"agent\": \"{{webid}}\"}"
-        }
-      },
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
+            "name": "Delete VC",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/credentials/123",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "credentials",
+                        "123"
+                    ]
+                },
+                "body": null
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ]
+                    }
+                }
             ]
-          }
+        },
+        {
+            "name": "Update ACL",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/.acl",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        ".acl"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"access\": \"read\", \"agent\": \"{{webid}}\"}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ]
+                    }
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

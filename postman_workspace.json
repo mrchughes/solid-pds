@@ -1,0 +1,59 @@
+{
+    "info": {
+        "name": "Solid PDS Service Workspace",
+        "description": "API collections for the Solid PDS service"
+    },
+    "collections": [
+        {
+            "name": "Solid PDS Service",
+            "path": "./solid_pds_collection.json"
+        }
+    ],
+    "environments": [
+        {
+            "name": "Local Development",
+            "values": [
+                {
+                    "key": "solid_pds_url",
+                    "value": "http://localhost:3000",
+                    "enabled": true
+                },
+                {
+                    "key": "oidc_provider_url",
+                    "value": "http://localhost:3001",
+                    "enabled": true
+                },
+                {
+                    "key": "webid",
+                    "value": "https://user.example.org/profile/card#me",
+                    "enabled": true
+                },
+                {
+                    "key": "access_token",
+                    "value": "dummy_token",
+                    "enabled": true
+                },
+                {
+                    "key": "vc_example_turtle",
+                    "value": "@prefix cred: <https://www.w3.org/2018/credentials#> .\n@prefix schema: <http://schema.org/> .\n\n<urn:uuid:benefit-award-vc-123> a cred:VerifiableCredential .",
+                    "enabled": true
+                }
+            ]
+        },
+        {
+            "name": "Test Environment",
+            "values": [
+                {
+                    "key": "solid_pds_url",
+                    "value": "https://pds.test.example.org",
+                    "enabled": true
+                },
+                {
+                    "key": "oidc_provider_url",
+                    "value": "https://oidc.test.example.org",
+                    "enabled": true
+                }
+            ]
+        }
+    ]
+}
