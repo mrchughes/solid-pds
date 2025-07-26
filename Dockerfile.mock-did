@@ -1,0 +1,18 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install express uuid
+
+# Copy mock service
+COPY test/mocks/services/mock-did-ion.js ./
+
+# Expose port
+EXPOSE 8002
+
+# Start the service
+CMD ["node", "mock-did-ion.js"]

@@ -1,0 +1,19 @@
+@prefix solid: <http://www.w3.org/ns/solid/terms#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix pim: <http://www.w3.org/ns/pim/space#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#me> a foaf:Person ;
+    foaf:name "Test User" ;
+    foaf:givenName "Test" ;
+    foaf:familyName "User" ;
+    foaf:email "test.user@example.org" ;
+    solid:oidcIssuer <https://oidc.solid.gov.uk> ;
+    pim:storage <../> ;
+    dc:created "2025-07-26T12:00:00Z"^^xsd:dateTime ;
+    dc:modified "2025-07-26T12:00:00Z"^^xsd:dateTime ;
+    dc:title "Test User WebID Profile" .
+
+<../> a pim:Storage ;
+    dc:title "Test User Pod Storage" .

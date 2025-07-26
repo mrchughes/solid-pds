@@ -2,17 +2,50 @@ openapi: 3.0.3
 info:
   title: Solid PDS
   version: 1.0.0
-  description: Solid Personal Data Store API for the PDS3.0 project
+  description: Solid Personal Data Store - Headless implementation for PDS3.0 project. Provides RDF-native storage with Solid-compliant Pod and WebID support for Verifiable Credentials.
+  contact:
+    name: PDS3.0 Project
+    url: https://github.com/pds3.0/solid-pds
 servers:
   - url: http://localhost:3000
     description: Local development server
+  - url: https://pds.example.org
+    description: Production server
 paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  service:
+                    type: string
+                    example: Solid Personal Data Store
+                  version:
+                    type: string
+                    example: 1.0.0
+                  timestamp:
+                    type: string
+                    format: date-time
   /profile/card:
     get:
       summary: Get WebID Profile
+      tags:
+        - Profile
       responses:
         '200':
-          description: WebID profile in Turtle
+          description: WebID profile in Turtle format
           content:
             text/turtle:
               schema:
@@ -20,83 +53,467 @@ paths:
                 example: |
                   @prefix solid: <http://www.w3.org/ns/solid/terms#> .
                   @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                  @prefix pim: <http://www.w3.org/ns/pim/space#> .
+                  @prefix dc: <http://purl.org/dc/terms/> .
                   
                   <#me> a foaf:Person ;
-                    foaf:name "Test User" ;
-                    solid:oidcIssuer <https://oidc.example.org> .
+                    foaf:name "PDS User" ;
+                    solid:oidcIssuer <https://oidc.solid.gov.uk> ;
+                    pim:storage <../> ;
+                    dc:created "2025-07-26T12:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Update WebID Profile
+      tags:
+        - Profile
       requestBody:
+        required: true
         content:
           text/turtle:
             schema:
               type: string
+              example: |
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                <#me> a foaf:Person ;
+                  foaf:name "Updated Name" .
       responses:
         '200':
-          description: Updated
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile updated successfully
+                  webid:
+                    type: string
+                    example: https://user.example.org/profile/card#me
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /credentials/index.ttl:
+    get:
+      summary: Get index of all credentials
+      tags:
+        - Credentials
+      responses:
+        '200':
+          description: Index of all credentials in Turtle format
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  @prefix ldp: <http://www.w3.org/ns/ldp#> .
+                  @prefix dc: <http://purl.org/dc/terms/> .
+                  
+                  <./> a ldp:Container ;
+                       dc:title "Credentials Container" ;
+                       ldp:contains <./pip-benefit-123.ttl>, <./eon-discount-456.ttl> .
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /credentials/{vcId}:
     get:
       summary: Read credential
+      tags:
+        - Credentials
       parameters:
         - name: vcId
           in: path
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
+          example: pip-benefit-123
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+            enum: [text/turtle, application/ld+json]
+          example: text/turtle
       responses:
         '200':
-          description: VC as Turtle or JSON-LD
+          description: Verifiable Credential in requested format
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  @prefix cred: <https://www.w3.org/2018/credentials#> .
+                  @prefix schema: <http://schema.org/> .
+                  
+                  <urn:uuid:pip-benefit-123>
+                    a cred:VerifiableCredential ;
+                    cred:issuer <https://pip.gov.uk/did.json> ;
+                    cred:credentialSubject <https://user.example.org/profile/card#me> ;
+                    schema:benefitType "PIP" ;
+                    schema:amount "£90.10/week" .
+            application/ld+json:
+              schema:
+                type: object
+                example:
+                  "@context": ["https://www.w3.org/2018/credentials/v1", "https://schema.org/"]
+                  "id": "urn:uuid:pip-benefit-123"
+                  "type": ["VerifiableCredential", "BenefitCredential"]
+                  "issuer": "https://pip.gov.uk/did.json"
+                  "credentialSubject":
+                    "id": "https://user.example.org/profile/card#me"
+                    "benefitType": "PIP"
+                    "amount": "£90.10/week"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Write credential
+      tags:
+        - Credentials
       parameters:
         - name: vcId
           in: path
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
+          example: pip-benefit-123
       requestBody:
+        required: true
         content:
           text/turtle:
             schema:
               type: string
+              example: |
+                @prefix cred: <https://www.w3.org/2018/credentials#> .
+                @prefix schema: <http://schema.org/> .
+                
+                <urn:uuid:pip-benefit-123>
+                  a cred:VerifiableCredential ;
+                  cred:issuer <https://pip.gov.uk/did.json> ;
+                  cred:credentialSubject <https://user.example.org/profile/card#me> ;
+                  schema:benefitType "PIP" ;
+                  schema:amount "£90.10/week" .
           application/ld+json:
             schema:
               type: object
+              example:
+                "@context": ["https://www.w3.org/2018/credentials/v1", "https://schema.org/"]
+                "id": "urn:uuid:pip-benefit-123"
+                "type": ["VerifiableCredential", "BenefitCredential"]
+                "issuer": "https://pip.gov.uk/did.json"
+                "credentialSubject":
+                  "id": "https://user.example.org/profile/card#me"
+                  "benefitType": "PIP"
+                  "amount": "£90.10/week"
       responses:
         '201':
-          description: Stored
+          description: Credential stored successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Credential stored successfully
+                  id:
+                    type: string
+                    example: pip-benefit-123
+                  contentType:
+                    type: string
+                    example: text/turtle
+                  location:
+                    type: string
+                    example: /credentials/pip-benefit-123
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       summary: Delete credential
+      tags:
+        - Credentials
       parameters:
         - name: vcId
           in: path
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
+          example: pip-benefit-123
       responses:
         '204':
-          description: Deleted
+          description: Credential deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /.acl:
+    get:
+      summary: Get access permissions
+      tags:
+        - Access Control
+      responses:
+        '200':
+          description: Access control rules in Turtle format
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  @prefix acl: <http://www.w3.org/ns/auth/acl#> .
+                  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                  
+                  <#owner>
+                      a acl:Authorization ;
+                      acl:agent <https://user.example.org/profile/card#me> ;
+                      acl:accessTo <./> ;
+                      acl:mode acl:Read, acl:Write, acl:Control .
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Set access permissions
+      tags:
+        - Access Control
       requestBody:
+        required: true
         content:
           text/turtle:
             schema:
               type: string
+              example: |
+                @prefix acl: <http://www.w3.org/ns/auth/acl#> .
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                
+                <#owner>
+                    a acl:Authorization ;
+                    acl:agent <https://user.example.org/profile/card#me> ;
+                    acl:accessTo <./> ;
+                    acl:mode acl:Read, acl:Write, acl:Control .
       responses:
         '200':
-          description: Access rules updated
+          description: Access rules updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Access rules updated successfully
+                  webid:
+                    type: string
+                    example: https://user.example.org/profile/card#me
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /credentials/{vcId}/.acl:
+    get:
+      summary: Get access permissions for specific credential
+      tags:
+        - Access Control
+      parameters:
+        - name: vcId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
+          example: pip-benefit-123
+      responses:
+        '200':
+          description: Credential access control rules in Turtle format
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  @prefix acl: <http://www.w3.org/ns/auth/acl#> .
+                  
+                  <#owner>
+                      a acl:Authorization ;
+                      acl:agent <https://user.example.org/profile/card#me> ;
+                      acl:accessTo <pip-benefit-123.ttl> ;
+                      acl:mode acl:Read, acl:Write, acl:Control .
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Set access permissions for specific credential
+      tags:
+        - Access Control
+      parameters:
+        - name: vcId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
+          example: pip-benefit-123
+      requestBody:
+        required: true
+        content:
+          text/turtle:
+            schema:
+              type: string
+              example: |
+                @prefix acl: <http://www.w3.org/ns/auth/acl#> .
+                
+                <#shared>
+                    a acl:Authorization ;
+                    acl:agent <https://eon.co.uk/service#id> ;
+                    acl:accessTo <pip-benefit-123.ttl> ;
+                    acl:mode acl:Read .
+      responses:
+        '200':
+          description: Credential access rules updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Credential access rules updated successfully
+                  vcId:
+                    type: string
+                    example: pip-benefit-123
+                  webid:
+                    type: string
+                    example: https://user.example.org/profile/card#me
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     solidOidc:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: https://oidc.example.org/authorize
-          tokenUrl: https://oidc.example.org/token
-          scopes:
-            openid: OpenID connect scope
-            webid: WebID scope
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Solid OIDC Bearer token containing WebID claim. Example token structure:
+        {
+          "webid": "https://user.example.org/profile/card#me",
+          "iss": "https://oidc.solid.gov.uk",
+          "aud": "https://pds.example.org",
+          "scope": "openid profile webid",
+          "exp": 1722000000
+        }
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Bad Request
+              message:
+                type: string
+                example: Invalid request format or parameters
+              timestamp:
+                type: string
+                format: date-time
+              path:
+                type: string
+                example: /credentials/invalid-id
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+              message:
+                type: string
+                example: Missing or invalid authorization header
+              timestamp:
+                type: string
+                format: date-time
+              path:
+                type: string
+                example: /profile/card
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+              message:
+                type: string
+                example: The requested resource was not found
+              timestamp:
+                type: string
+                format: date-time
+              path:
+                type: string
+                example: /credentials/missing-id
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Internal Server Error
+              message:
+                type: string
+                example: An unexpected error occurred
+              timestamp:
+                type: string
+                format: date-time
+              path:
+                type: string
+                example: /credentials/example-id
 security:
-  - solidOidc: [openid, webid]
+  - solidOidc: []

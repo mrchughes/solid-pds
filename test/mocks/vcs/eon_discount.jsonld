@@ -1,0 +1,29 @@
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://schema.org/"
+    ],
+    "id": "urn:uuid:eon-discount-67890",
+    "type": [
+        "VerifiableCredential",
+        "DiscountEligibilityCredential"
+    ],
+    "issuer": "https://eon.co.uk/did.json",
+    "issuanceDate": "2025-07-26T13:00:00Z",
+    "credentialSubject": {
+        "id": "https://user.example.org/profile/card#me",
+        "discountType": "Energy Discount",
+        "discountAmount": "£150/year",
+        "discountPercentage": "15%",
+        "eligibilityReason": "PIP benefit recipient",
+        "startDate": "2025-08-01",
+        "endDate": "2026-08-01"
+    },
+    "proof": {
+        "type": "RsaSignature2018",
+        "created": "2025-07-26T13:00:00Z",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "https://eon.co.uk/keys/456#pub",
+        "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..example-eon-signature"
+    }
+}

@@ -1,0 +1,15 @@
+FROM python:3.9-alpine
+
+WORKDIR /app
+
+# Install Flask and dependencies
+RUN pip install flask pyjwt
+
+# Copy mock service
+COPY test/mocks/services/mock-solid-idp.py ./
+
+# Expose port
+EXPOSE 8001
+
+# Start the service
+CMD ["python", "mock-solid-idp.py"]

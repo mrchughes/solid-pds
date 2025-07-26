@@ -1,0 +1,29 @@
+@prefix cred: <https://www.w3.org/2018/credentials#> .
+@prefix schema: <http://schema.org/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:uuid:pip-benefit-12345>
+    a cred:VerifiableCredential ;
+    cred:issuer <https://pip.gov.uk/did.json> ;
+    cred:issuanceDate "2025-07-26T12:00:00Z"^^xsd:dateTime ;
+    cred:credentialSubject <https://user.example.org/profile/card#me> ;
+    cred:proof [
+        a cred:Proof ;
+        cred:type "RsaSignature2018" ;
+        cred:created "2025-07-26T12:00:00Z"^^xsd:dateTime ;
+        cred:proofPurpose "assertionMethod" ;
+        cred:verificationMethod <https://pip.gov.uk/keys/123#pub> ;
+        cred:jws "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..example-signature"
+    ] ;
+    schema:benefitType "PIP" ;
+    schema:amount "£90.10/week" ;
+    schema:startDate "2025-07-01"^^xsd:date ;
+    schema:endDate "2026-07-01"^^xsd:date ;
+    dc:title "Personal Independence Payment Benefit Award" ;
+    dc:description "Weekly benefit payment for personal independence support" .
+
+<https://user.example.org/profile/card#me>
+    schema:benefitType "PIP" ;
+    schema:dailyLivingComponent "£68.10/week" ;
+    schema:mobilityComponent "£22.00/week" .

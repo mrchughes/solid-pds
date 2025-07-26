@@ -1,0 +1,31 @@
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://schema.org/"
+    ],
+    "id": "urn:uuid:pip-benefit-12345",
+    "type": [
+        "VerifiableCredential",
+        "BenefitCredential"
+    ],
+    "issuer": "https://pip.gov.uk/did.json",
+    "issuanceDate": "2025-07-26T12:00:00Z",
+    "credentialSubject": {
+        "id": "https://user.example.org/profile/card#me",
+        "benefitType": "PIP",
+        "amount": "£90.10/week",
+        "startDate": "2025-07-01",
+        "endDate": "2026-07-01",
+        "components": {
+            "dailyLivingComponent": "£68.10/week",
+            "mobilityComponent": "£22.00/week"
+        }
+    },
+    "proof": {
+        "type": "RsaSignature2018",
+        "created": "2025-07-26T12:00:00Z",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "https://pip.gov.uk/keys/123#pub",
+        "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..example-signature"
+    }
+}
